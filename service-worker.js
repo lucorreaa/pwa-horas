@@ -1,30 +1,364 @@
-const CACHE_NAME = "pwa-horas-v5";
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.json",
-  "./service-worker.js"
-];
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <title>Calculadora de Horas</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e5e7eb;
+      --border:rgba(148,163,184,.22);
+      --btn:#2563eb; --btn2:#111827;
+      --good:#22c55e; --bad:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    [data-theme="light"]{
+      --bg:#f5f7fb; --card:#ffffff; --muted:#475569; --text:#0f172a;
+      --border:rgba(15,23,42,.14);
+      --btn:#2563eb; --btn2:#0f172a;
+      --shadow: 0 10px 30px rgba(2,6,23,.10);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 30% -10%, rgba(37,99,235,.22), transparent 55%),
+                  radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.18), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      padding:24px;
+    }
+    .wrap{width:min(680px, 100%)}
+    header{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+      margin-bottom:18px;
+    }
+    h1{font-size:20px; margin:0 0 4px 0;}
+    .sub{color:var(--muted); font-size:13px;}
+    .card{
+      background: rgba(255,255,255,.02);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+    }
+    .cardInner{padding:18px}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width:640px){
+      .grid{grid-template-columns:1fr}
+    }
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+    }
+    input:focus{border-color: rgba(37,99,235,.7)}
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      margin-top:14px;
+    }
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      border:none;
+      padding:11px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      color:white;
+      font-weight:600;
+      background:var(--btn);
+    }
+    button.secondary{background:transparent; border:1px solid var(--border); color:var(--text)}
+    button.ghost{background:transparent; color:var(--text)}
+    .results{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width:640px){
+      .results{grid-template-columns:1fr}
+    }
+    .box{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      background: rgba(255,255,255,.02);
+    }
+    .k{font-size:12px; color:var(--muted); margin-bottom:6px}
+    .v{font-size:18px; font-weight:800; letter-spacing:.2px}
+    .hint{margin-top:10px; color:var(--muted); font-size:12px}
+    .badge{
+      font-size:12px; font-weight:700;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      color: var(--text);
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .dot{width:8px; height:8px; border-radius:999px; background: var(--good)}
+    .dot.bad{background: var(--bad)}
+    .topRight{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
+    .small{font-size:12px; color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Calculadora de Horas</h1>
+        <div class="sub">Entrada, saída, almoço e carga → horas trabalhadas e extra (offline e instalável).</div>
+      </div>
+      <div class="topRight">
+        <span id="statusBadge" class="badge"><span class="dot"></span><span id="statusText">Pronto</span></span>
+        <button id="themeBtn" class="secondary" type="button">🌙 Tema</button>
+      </div>
+    </header>
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    <div class="card">
+      <div class="cardInner">
+        <div class="grid">
+          <div>
+            <label for="entrada">Entrada</label>
+            <input id="entrada" type="time" value="09:00" />
+          </div>
+
+          <div>
+            <label for="saida">Saída</label>
+            <input id="saida" type="time" value="19:10" />
+          </div>
+
+          <div>
+            <label for="almoco">Almoço (horas)</label>
+            <input id="almoco" type="number" min="0" step="0.25" value="1" inputmode="decimal" />
+          </div>
+
+          <div>
+            <label for="carga">Carga horária (HH:MM)</label>
+            <input id="carga" type="time" value="07:20" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="btns">
+            <button id="calcBtn" type="button">Calcular</button>
+            <button id="saveBtn" class="secondary" type="button">Salvar</button>
+            <button id="clearBtn" class="ghost" type="button">Limpar</button>
+          </div>
+          <div class="small" id="installHint"></div>
+        </div>
+
+        <div class="results">
+          <div class="box">
+            <div class="k">Horas trabalhadas</div>
+            <div class="v" id="worked">—</div>
+          </div>
+          <div class="box">
+            <div class="k">Hora extra (acima da carga)</div>
+            <div class="v" id="extra">—</div>
+          </div>
+          <div class="box">
+            <div class="k">Saldo do dia (vs carga)</div>
+            <div class="v" id="saldo">—</div>
+          </div>
+        </div>
+
+        <div class="hint">
+          Dica: se sua saída for depois da meia-noite (ex.: entrou 22:00 e saiu 06:00), o app entende automaticamente.
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  // Inputs
+  const entradaEl = $("entrada");
+  const saidaEl   = $("saida");
+  const almocoEl  = $("almoco");
+  const cargaEl   = $("carga");
+
+  // Outputs
+  const workedEl = $("worked");
+  const extraEl  = $("extra");
+  const saldoEl  = $("saldo");
+
+  const statusBadge = $("statusBadge");
+  const statusText  = $("statusText");
+  const dot = statusBadge.querySelector(".dot");
+
+  const themeBtn = $("themeBtn");
+  const installHint = $("installHint");
+
+  const KEY = "pwa_horas_v1";
+
+  function setStatus(text, isBad=false){
+    statusText.textContent = text;
+    dot.classList.toggle("bad", isBad);
+  }
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+
+  function msToHHMMSS(ms){
+    const sign = ms < 0 ? -1 : 1;
+    ms = Math.abs(ms);
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    const out = `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+    return sign < 0 ? "-" + out : out;
+  }
+
+  function parseTimeToMs(timeStr){
+    // timeStr "HH:MM"
+    const [hh, mm] = timeStr.split(":").map(Number);
+    const d = new Date();
+    d.setHours(hh, mm, 0, 0);
+    return d.getTime();
+  }
+
+  function cargaToMs(hhmm){
+    const [hh, mm] = hhmm.split(":").map(Number);
+    return ((hh * 60) + mm) * 60 * 1000;
+  }
+
+  function calc(){
+    const entrada = entradaEl.value;
+    const saida   = saidaEl.value;
+    const almocoH = Number(almocoEl.value ?? 0);
+    const carga   = cargaEl.value; // "HH:MM"
+
+    if(!entrada || !saida || !carga || Number.isNaN(almocoH) || almocoH < 0){
+      setStatus("Preencha corretamente", true);
+      return null;
+    }
+
+    const inMs  = parseTimeToMs(entrada);
+    let outMs   = parseTimeToMs(saida);
+
+    // Se saída for "menor" que entrada, assume que virou o dia
+    if(outMs < inMs) outMs += 24 * 60 * 60 * 1000;
+
+    const lunchMs = almocoH * 60 * 60 * 1000;
+
+    const workedMs = (outMs - inMs) - lunchMs;
+    const baseMs   = cargaToMs(carga);
+
+    const extraMs = Math.max(0, workedMs - baseMs);
+    const saldoMs = workedMs - baseMs;
+
+    workedEl.textContent = msToHHMMSS(workedMs);
+    extraEl.textContent  = msToHHMMSS(extraMs);
+    saldoEl.textContent  = msToHHMMSS(saldoMs);
+
+    setStatus("Calculado");
+    return { entrada, saida, almocoH, carga, workedMs, extraMs, saldoMs, at: Date.now() };
+  }
+
+  function save(){
+    const result = calc();
+    if(!result) return;
+    localStorage.setItem(KEY, JSON.stringify(result));
+    setStatus("Salvo");
+  }
+
+  function load(){
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return;
+    try{
+      const data = JSON.parse(raw);
+      entradaEl.value = data.entrada ?? "09:00";
+      saidaEl.value   = data.saida ?? "18:00";
+      almocoEl.value  = data.almocoH ?? 1;
+      cargaEl.value   = data.carga ?? "07:20";
+      calc();
+      setStatus("Carregado");
+    }catch{
+      // ignora
+    }
+  }
+
+  function clearAll(){
+    entradaEl.value = "09:00";
+    saidaEl.value   = "18:00";
+    almocoEl.value  = 1;
+    cargaEl.value   = "07:20";
+    workedEl.textContent = "—";
+    extraEl.textContent  = "—";
+    saldoEl.textContent  = "—";
+    localStorage.removeItem(KEY);
+    setStatus("Limpo");
+  }
+
+  // Tema (manual)
+  function getTheme(){ return localStorage.getItem("theme") || "dark"; }
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+    localStorage.setItem("theme", t);
+    themeBtn.textContent = t === "light" ? "🌞 Tema" : "🌙 Tema";
+  }
+  themeBtn.addEventListener("click", () => {
+    applyTheme(getTheme() === "light" ? "dark" : "light");
+  });
+
+  $("calcBtn").addEventListener("click", calc);
+  $("saveBtn").addEventListener("click", save);
+  $("clearBtn").addEventListener("click", clearAll);
+
+  // Auto-calc ao mudar
+  [entradaEl, saidaEl, almocoEl, cargaEl].forEach(el =>
+    el.addEventListener("change", calc)
   );
-  self.skipWaiting();
-});
 
-self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
-    )
-  );
-  self.clients.claim();
-});
+  // Service Worker
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+  }
 
-self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
-  );
-});
+  // Instalação (banner)
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installHint.innerHTML = `<button id="installBtn" class="secondary" type="button">📲 Instalar</button>`;
+    setTimeout(() => {
+      const btn = document.getElementById("installBtn");
+      if(btn){
+        btn.addEventListener("click", async () => {
+          try{
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+          } finally {
+            deferredPrompt = null;
+            installHint.textContent = "";
+          }
+        });
+      }
+    }, 0);
+  });
 
+  applyTheme(getTheme());
+  load();
+})();
+</script>
+</body>
+</html>
