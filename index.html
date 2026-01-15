@@ -49,14 +49,28 @@
       overflow:hidden;
     }
     .cardInner{padding:18px}
+
+    /* ====== Inputs (topo) ====== */
     .grid{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap:12px;
     }
+
+    /* No mobile: deixa SOMENTE os inputs de cima mais estreitos e centralizados */
     @media (max-width:640px){
-      .grid{grid-template-columns:1fr}
+      .grid{
+        grid-template-columns: 1fr;
+        width: min(420px, 100%);  /* ajuste: 420px (pode trocar p/ 380px se quiser mais estreito) */
+        margin: 0 auto;           /* centraliza o bloco de inputs */
+      }
+      .row{
+        width: min(420px, 100%);  /* alinha botões com a mesma largura dos inputs */
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
+
     label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
     input{
       width:100%;
@@ -69,6 +83,7 @@
       font-size:15px;
     }
     input:focus{border-color: rgba(37,99,235,.7)}
+
     .row{
       display:flex; gap:10px; flex-wrap:wrap;
       align-items:center; justify-content:space-between;
@@ -86,6 +101,8 @@
     }
     button.secondary{background:transparent; border:1px solid var(--border); color:var(--text)}
     button.ghost{background:transparent; color:var(--text)}
+
+    /* ====== Resultados (embaixo) ====== */
     .results{
       margin-top:14px;
       display:grid;
@@ -116,34 +133,6 @@
     .dot.bad{background: var(--bad)}
     .topRight{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
     .small{font-size:12px; color:var(--muted)}
-          /* ===== Ajuste de alinhamento no celular (SÓ inputs de cima) ===== */
-      @media (max-width: 640px) {
-        /* deixa apenas o bloco dos inputs com largura fixa e centralizado */
-        .grid{
-          width: min(420px, 100%);
-          margin: 0 auto;
-          grid-template-columns: 1fr; /* mobile */
-        }
-      
-        /* garante que cada linha de input ocupe a mesma largura */
-        .grid > div{
-          width: 100%;
-        }
-      
-        /* inputs ocupam toda a largura do bloco */
-        .grid input{
-          width: 100%;
-        }
-      
-        /* alinha os botões com o mesmo "miolo" dos inputs */
-        .row{
-          width: min(420px, 100%);
-          margin-left: auto;
-          margin-right: auto;
-        }
-      }
-
-
   </style>
 </head>
 <body>
@@ -390,5 +379,3 @@
 </script>
 </body>
 </html>
-
-
