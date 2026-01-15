@@ -138,15 +138,23 @@
             <label for="entrada">Entrada</label>
             <input id="entrada" type="time" value="09:00" />
           </div>
+        
           <div>
             <label for="saida">Saída</label>
             <input id="saida" type="time" value="19:10" />
           </div>
+        
           <div>
             <label for="almoco">Almoço (horas)</label>
-            <input id="almoco" type="number" min="0" step="0.25" value="1" inputmode="decimal" />
+            <input id="almoco" type="number" min="0" step="0.25" value="1" />
+          </div>
+        
+          <div>
+            <label for="carga">Carga horária (HH:MM)</label>
+            <input id="carga" type="time" value="07:20" />
           </div>
         </div>
+
 
         <div class="row">
           <div class="btns">
@@ -230,6 +238,8 @@
     const entrada = entradaEl.value;
     const saida   = saidaEl.value;
     const almocoH = Number(almocoEl.value ?? 0);
+    const cargaEl   = $("carga");
+
 
     if(!entrada || !saida || Number.isNaN(almocoH) || almocoH < 0){
       setStatus("Preencha corretamente", true);
@@ -245,7 +255,15 @@
     const lunchMs = almocoH * 60 * 60 * 1000;
 
     const workedMs = (outMs - inMs) - lunchMs;
-    const baseMs   = 8 * 60 * 60 * 1000;
+    const carga = cargaEl.value; // HH:MM
+    if (!carga) {
+      setStatus("Informe a carga horária", true);
+      return null;
+}
+
+const [ch, cm] = carga.split(":").map(Number);
+const baseMs = ((ch * 60) + cm) * 60 * 1000;
+
 
     const extraMs = Math.max(0, workedMs - baseMs);
     const saldoMs = workedMs - baseMs;
@@ -308,7 +326,10 @@
   $("clearBtn").addEventListener("click", clearAll);
 
   // auto-calc ao mudar
-  [entradaEl, saidaEl, almocoEl].forEach(el => el.addEventListener("change", calc));
+  [entradaEl, saidaEl, almocoEl, cargaEl].forEach(el =>
+  el.addEventListener("change", calc)
+);
+
 
   // Service Worker
   if("serviceWorker" in navigator){
