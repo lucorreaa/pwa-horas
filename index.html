@@ -8,386 +8,134 @@
   <link rel="manifest" href="manifest.json" />
   <style>
     :root{
-      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e5e7eb;
+      --bg:#0b1220; --muted:#94a3b8; --text:#e5e7eb;
       --border:rgba(148,163,184,.22);
-      --btn:#2563eb; --btn2:#111827;
-      --good:#22c55e; --bad:#ef4444;
-      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --btn:#2563eb;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
       --radius:18px;
-    }
-    [data-theme="light"]{
-      --bg:#f5f7fb; --card:#ffffff; --muted:#475569; --text:#0f172a;
-      --border:rgba(15,23,42,.14);
-      --btn:#2563eb; --btn2:#0f172a;
-      --shadow: 0 10px 30px rgba(2,6,23,.10);
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 30% -10%, rgba(37,99,235,.22), transparent 55%),
-                  radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.18), transparent 50%),
-                  var(--bg);
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:var(--bg);
       color:var(--text);
       min-height:100vh;
       display:flex;
       justify-content:center;
       padding:24px;
     }
-    .wrap{width:min(680px, 100%)}
-    header{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
-      margin-bottom:18px;
-    }
-    h1{font-size:20px; margin:0 0 4px 0;}
-    .sub{color:var(--muted); font-size:13px;}
+    .wrap{width:min(680px,100%)}
     .card{
-      background: rgba(255,255,255,.02);
+      background:rgba(255,255,255,.02);
       border:1px solid var(--border);
       border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      overflow:hidden;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
     }
     .cardInner{padding:18px}
     .grid{
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:12px;
     }
     @media (max-width:640px){
       .grid{grid-template-columns:1fr}
-    }
-
-    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
-
-    input{
-      width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      color:var(--text);
-      outline:none;
-      font-size:15px;
-    }
-    input:focus{border-color: rgba(37,99,235,.7)}
-
-    /* ✅ MOBILE: diminuir o COMPRIMENTO dos 4 inputs do topo (sem mudar estilo/tamanho)
-       e centralizar deixando “folga” dos lados */
-    @media (max-width:640px){
       .grid input{
-        width: calc(100% - 24px); /* cria folga dos lados sem mexer no container */
-        margin: 0 auto;           /* centraliza dentro da coluna */
+        width:calc(100% - 24px);
+        margin:0 auto;
         display:block;
       }
-
-      /* mantém o label alinhado com o input (mesma folga) */
       .grid label{
-        width: calc(100% - 24px);
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      /* botões alinhados com os inputs (mesma folga) */
-      .row{
-        width: calc(100% - 24px);
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      /* Almoço: padroniza altura com os inputs time no iOS */
-      #almoco{
-        height: 44px;
-        line-height: 44px;
-        padding-top: 0;
-        padding-bottom: 0;
-        -webkit-appearance: none;
-        appearance: none;
+        width:calc(100% - 24px);
+        margin:0 auto;
       }
     }
-
-    .row{
-      display:flex; gap:10px; flex-wrap:wrap;
-      align-items:center; justify-content:space-between;
-      margin-top:14px;
+    label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
+    input{
+      width:100%;
+      height:44px;
+      padding:0 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-size:15px;
     }
-    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    .row{margin-top:14px}
     button{
-      border:none;
       padding:11px 14px;
       border-radius:14px;
-      cursor:pointer;
-      color:white;
-      font-weight:600;
+      border:none;
       background:var(--btn);
+      color:#fff;
+      font-weight:600;
     }
-    button.secondary{background:transparent; border:1px solid var(--border); color:var(--text)}
-    button.ghost{background:transparent; color:var(--text)}
-    .results{
-      margin-top:14px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap:12px;
-    }
-    @media (max-width:640px){
-      .results{grid-template-columns:1fr}
-    }
-    .box{
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:14px;
-      background: rgba(255,255,255,.02);
-    }
-    .k{font-size:12px; color:var(--muted); margin-bottom:6px}
-    .v{font-size:18px; font-weight:800; letter-spacing:.2px}
-    .hint{margin-top:10px; color:var(--muted); font-size:12px}
-    .badge{
-      font-size:12px; font-weight:700;
-      padding:8px 10px; border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.02);
-      color: var(--text);
-      display:inline-flex; align-items:center; gap:8px;
-    }
-    .dot{width:8px; height:8px; border-radius:999px; background: var(--good)}
-    .dot.bad{background: var(--bad)}
-    .topRight{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
-    .small{font-size:12px; color:var(--muted)}
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Calculadora de Horas</h1>
-        <div class="sub">Entrada, saída, almoço e carga → horas trabalhadas e extra (offline e instalável).</div>
-      </div>
-      <div class="topRight">
-        <span id="statusBadge" class="badge"><span class="dot"></span><span id="statusText">Pronto</span></span>
-        <button id="themeBtn" class="secondary" type="button">🌙 Tema</button>
-      </div>
-    </header>
-
-    <div class="card">
-      <div class="cardInner">
-        <div class="grid">
-          <div>
-            <label for="entrada">Entrada</label>
-            <input id="entrada" type="time" value="09:00" />
-          </div>
-
-          <div>
-            <label for="saida">Saída</label>
-            <input id="saida" type="time" value="19:10" />
-          </div>
-
-          <div>
-            <label for="almoco">Almoço (horas)</label>
-            <input id="almoco" type="number" min="0" step="0.25" value="1" inputmode="decimal" />
-          </div>
-
-          <div>
-            <label for="carga">Carga horária (HH:MM)</label>
-            <input id="carga" type="time" value="07:20" />
-          </div>
+<div class="wrap">
+  <div class="card">
+    <div class="cardInner">
+      <div class="grid">
+        <div>
+          <label>Entrada</label>
+          <input id="entrada" type="time" value="09:00">
         </div>
 
-        <div class="row">
-          <div class="btns">
-            <button id="calcBtn" type="button">Calcular</button>
-            <button id="saveBtn" class="secondary" type="button">Salvar</button>
-            <button id="clearBtn" class="ghost" type="button">Limpar</button>
-          </div>
-          <div class="small" id="installHint"></div>
+        <div>
+          <label>Saída</label>
+          <input id="saida" type="time" value="19:10">
         </div>
 
-        <div class="results">
-          <div class="box">
-            <div class="k">Horas trabalhadas</div>
-            <div class="v" id="worked">—</div>
-          </div>
-          <div class="box">
-            <div class="k">Hora extra (acima da carga)</div>
-            <div class="v" id="extra">—</div>
-          </div>
-          <div class="box">
-            <div class="k">Saldo do dia (vs carga)</div>
-            <div class="v" id="saldo">—</div>
-          </div>
+        <div>
+          <label>Almoço</label>
+          <input id="almoco" type="time" value="01:00" step="900">
         </div>
 
-        <div class="hint">
-          Dica: se sua saída for depois da meia-noite (ex.: entrou 22:00 e saiu 06:00), o app entende automaticamente.
+        <div>
+          <label>Carga horária</label>
+          <input id="carga" type="time" value="07:20">
         </div>
       </div>
+
+      <div class="row">
+        <button onclick="calc()">Calcular</button>
+      </div>
+
+      <p id="out"></p>
     </div>
   </div>
+</div>
 
 <script>
-(() => {
-  const $ = (id) => document.getElementById(id);
+const $ = id => document.getElementById(id);
 
-  // Inputs
-  const entradaEl = $("entrada");
-  const saidaEl   = $("saida");
-  const almocoEl  = $("almoco");
-  const cargaEl   = $("carga");
+function timeToMs(hhmm){
+  const [h,m] = hhmm.split(":").map(Number);
+  return ((h*60)+m)*60*1000;
+}
 
-  // Outputs
-  const workedEl = $("worked");
-  const extraEl  = $("extra");
-  const saldoEl  = $("saldo");
+function timeToHours(hhmm){
+  const [h,m] = hhmm.split(":").map(Number);
+  return h + (m/60);
+}
 
-  const statusBadge = $("statusBadge");
-  const statusText  = $("statusText");
-  const dot = statusBadge.querySelector(".dot");
+function calc(){
+  const entrada = timeToMs($("entrada").value);
+  let saida = timeToMs($("saida").value);
+  const almocoH = timeToHours($("almoco").value);
+  const carga = timeToMs($("carga").value);
 
-  const themeBtn = $("themeBtn");
-  const installHint = $("installHint");
+  if(saida < entrada) saida += 86400000;
 
-  const KEY = "pwa_horas_v1";
+  const worked = (saida - entrada) - (almocoH * 3600000);
+  const extra = Math.max(0, worked - carga);
 
-  function setStatus(text, isBad=false){
-    statusText.textContent = text;
-    dot.classList.toggle("bad", isBad);
-  }
-
-  function pad2(n){ return String(n).padStart(2,"0"); }
-
-  function msToHHMMSS(ms){
-    const sign = ms < 0 ? -1 : 1;
-    ms = Math.abs(ms);
-    const totalSec = Math.floor(ms / 1000);
-    const h = Math.floor(totalSec / 3600);
-    const m = Math.floor((totalSec % 3600) / 60);
-    const s = totalSec % 60;
-    const out = `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
-    return sign < 0 ? "-" + out : out;
-  }
-
-  function parseTimeToMs(timeStr){
-    const [hh, mm] = timeStr.split(":").map(Number);
-    const d = new Date();
-    d.setHours(hh, mm, 0, 0);
-    return d.getTime();
-  }
-
-  function cargaToMs(hhmm){
-    const [hh, mm] = hhmm.split(":").map(Number);
-    return ((hh * 60) + mm) * 60 * 1000;
-  }
-
-  function calc(){
-    const entrada = entradaEl.value;
-    const saida   = saidaEl.value;
-    const almocoH = Number(almocoEl.value ?? 0);
-    const carga   = cargaEl.value;
-
-    if(!entrada || !saida || !carga || Number.isNaN(almocoH) || almocoH < 0){
-      setStatus("Preencha corretamente", true);
-      return null;
-    }
-
-    const inMs  = parseTimeToMs(entrada);
-    let outMs   = parseTimeToMs(saida);
-
-    if(outMs < inMs) outMs += 24 * 60 * 60 * 1000;
-
-    const lunchMs = almocoH * 60 * 60 * 1000;
-
-    const workedMs = (outMs - inMs) - lunchMs;
-    const baseMs   = cargaToMs(carga);
-
-    const extraMs = Math.max(0, workedMs - baseMs);
-    const saldoMs = workedMs - baseMs;
-
-    workedEl.textContent = msToHHMMSS(workedMs);
-    extraEl.textContent  = msToHHMMSS(extraMs);
-    saldoEl.textContent  = msToHHMMSS(saldoMs);
-
-    setStatus("Calculado");
-    return { entrada, saida, almocoH, carga, workedMs, extraMs, saldoMs, at: Date.now() };
-  }
-
-  function save(){
-    const result = calc();
-    if(!result) return;
-    localStorage.setItem(KEY, JSON.stringify(result));
-    setStatus("Salvo");
-  }
-
-  function load(){
-    const raw = localStorage.getItem(KEY);
-    if(!raw) return;
-    try{
-      const data = JSON.parse(raw);
-      entradaEl.value = data.entrada ?? "09:00";
-      saidaEl.value   = data.saida ?? "18:00";
-      almocoEl.value  = data.almocoH ?? 1;
-      cargaEl.value   = data.carga ?? "07:20";
-      calc();
-      setStatus("Carregado");
-    }catch{}
-  }
-
-  function clearAll(){
-    entradaEl.value = "09:00";
-    saidaEl.value   = "18:00";
-    almocoEl.value  = 1;
-    cargaEl.value   = "07:20";
-    workedEl.textContent = "—";
-    extraEl.textContent  = "—";
-    saldoEl.textContent  = "—";
-    localStorage.removeItem(KEY);
-    setStatus("Limpo");
-  }
-
-  function getTheme(){ return localStorage.getItem("theme") || "dark"; }
-  function applyTheme(t){
-    document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
-    localStorage.setItem("theme", t);
-    themeBtn.textContent = t === "light" ? "🌞 Tema" : "🌙 Tema";
-  }
-  themeBtn.addEventListener("click", () => {
-    applyTheme(getTheme() === "light" ? "dark" : "light");
-  });
-
-  $("calcBtn").addEventListener("click", calc);
-  $("saveBtn").addEventListener("click", save);
-  $("clearBtn").addEventListener("click", clearAll);
-
-  [entradaEl, saidaEl, almocoEl, cargaEl].forEach(el =>
-    el.addEventListener("change", calc)
-  );
-
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
-  }
-
-  let deferredPrompt = null;
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installHint.innerHTML = `<button id="installBtn" class="secondary" type="button">📲 Instalar</button>`;
-    setTimeout(() => {
-      const btn = document.getElementById("installBtn");
-      if(btn){
-        btn.addEventListener("click", async () => {
-          try{
-            deferredPrompt.prompt();
-            await deferredPrompt.userChoice;
-          } finally {
-            deferredPrompt = null;
-            installHint.textContent = "";
-          }
-        });
-      }
-    }, 0);
-  });
-
-  applyTheme(getTheme());
-  load();
-})();
+  $("out").innerText =
+    `Trabalhadas: ${(worked/3600000).toFixed(2)}h | Extra: ${(extra/3600000).toFixed(2)}h`;
+}
 </script>
 </body>
 </html>
