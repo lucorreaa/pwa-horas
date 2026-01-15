@@ -8,134 +8,375 @@
   <link rel="manifest" href="manifest.json" />
   <style>
     :root{
-      --bg:#0b1220; --muted:#94a3b8; --text:#e5e7eb;
+      --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e5e7eb;
       --border:rgba(148,163,184,.22);
-      --btn:#2563eb;
-      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --btn:#2563eb; --btn2:#111827;
+      --good:#22c55e; --bad:#ef4444;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
       --radius:18px;
+    }
+    [data-theme="light"]{
+      --bg:#f5f7fb; --card:#ffffff; --muted:#475569; --text:#0f172a;
+      --border:rgba(15,23,42,.14);
+      --btn:#2563eb; --btn2:#0f172a;
+      --shadow: 0 10px 30px rgba(2,6,23,.10);
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:var(--bg);
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 30% -10%, rgba(37,99,235,.22), transparent 55%),
+                  radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.18), transparent 50%),
+                  var(--bg);
       color:var(--text);
       min-height:100vh;
       display:flex;
       justify-content:center;
       padding:24px;
     }
-    .wrap{width:min(680px,100%)}
+    .wrap{width:min(680px, 100%)}
+    header{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+      margin-bottom:18px;
+    }
+    h1{font-size:20px; margin:0 0 4px 0;}
+    .sub{color:var(--muted); font-size:13px;}
     .card{
-      background:rgba(255,255,255,.02);
+      background: rgba(255,255,255,.02);
       border:1px solid var(--border);
       border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(10px);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
     }
     .cardInner{padding:18px}
     .grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap:12px;
     }
     @media (max-width:640px){
       .grid{grid-template-columns:1fr}
+    }
+
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
+    }
+    input:focus{border-color: rgba(37,99,235,.7)}
+
+    /* ✅ AJUSTE PEDIDO: SOMENTE OS 4 INPUTS DO TOPO no CELULAR
+       - diminui o comprimento (sobra dos lados)
+       - NÃO mexe no resto
+    */
+    @media (max-width:640px){
       .grid input{
-        width:calc(100% - 24px);
-        margin:0 auto;
+        width: calc(100% - 28px);   /* sobra lateral (ajuste fino: 20 / 28 / 36) */
+        margin: 0 auto;
         display:block;
       }
       .grid label{
-        width:calc(100% - 24px);
-        margin:0 auto;
+        width: calc(100% - 28px);
+        margin-left: auto;
+        margin-right: auto;
       }
     }
-    label{font-size:12px;color:var(--muted);margin-bottom:6px;display:block}
-    input{
-      width:100%;
-      height:44px;
-      padding:0 12px;
-      border-radius:14px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      color:var(--text);
-      font-size:15px;
+
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      margin-top:14px;
     }
-    .row{margin-top:14px}
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
     button{
+      border:none;
       padding:11px 14px;
       border-radius:14px;
-      border:none;
-      background:var(--btn);
-      color:#fff;
+      cursor:pointer;
+      color:white;
       font-weight:600;
+      background:var(--btn);
     }
+    button.secondary{background:transparent; border:1px solid var(--border); color:var(--text)}
+    button.ghost{background:transparent; color:var(--text)}
+    .results{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+    }
+    @media (max-width:640px){
+      .results{grid-template-columns:1fr}
+    }
+    .box{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      background: rgba(255,255,255,.02);
+    }
+    .k{font-size:12px; color:var(--muted); margin-bottom:6px}
+    .v{font-size:18px; font-weight:800; letter-spacing:.2px}
+    .hint{margin-top:10px; color:var(--muted); font-size:12px}
+    .badge{
+      font-size:12px; font-weight:700;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      color: var(--text);
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .dot{width:8px; height:8px; border-radius:999px; background: var(--good)}
+    .dot.bad{background: var(--bad)}
+    .topRight{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
+    .small{font-size:12px; color:var(--muted)}
   </style>
 </head>
-
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="cardInner">
-      <div class="grid">
-        <div>
-          <label>Entrada</label>
-          <input id="entrada" type="time" value="09:00">
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Calculadora de Horas</h1>
+        <div class="sub">Entrada, saída, almoço e carga → horas trabalhadas e extra (offline e instalável).</div>
+      </div>
+      <div class="topRight">
+        <span id="statusBadge" class="badge"><span class="dot"></span><span id="statusText">Pronto</span></span>
+        <button id="themeBtn" class="secondary" type="button">🌙 Tema</button>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="cardInner">
+        <div class="grid">
+          <div>
+            <label for="entrada">Entrada</label>
+            <input id="entrada" type="time" value="09:00" />
+          </div>
+
+          <div>
+            <label for="saida">Saída</label>
+            <input id="saida" type="time" value="19:10" />
+          </div>
+
+          <div>
+            <label for="almoco">Almoço (HH:MM)</label>
+            <!-- ✅ troca: era number, agora é time (seletor igual aos outros) -->
+            <!-- step=900 -> 15 minutos. Se quiser 5 min: step=300 -->
+            <input id="almoco" type="time" value="01:00" step="900" />
+          </div>
+
+          <div>
+            <label for="carga">Carga horária (HH:MM)</label>
+            <input id="carga" type="time" value="07:20" />
+          </div>
         </div>
 
-        <div>
-          <label>Saída</label>
-          <input id="saida" type="time" value="19:10">
+        <div class="row">
+          <div class="btns">
+            <button id="calcBtn" type="button">Calcular</button>
+            <button id="saveBtn" class="secondary" type="button">Salvar</button>
+            <button id="clearBtn" class="ghost" type="button">Limpar</button>
+          </div>
+          <div class="small" id="installHint"></div>
         </div>
 
-        <div>
-          <label>Almoço</label>
-          <input id="almoco" type="time" value="01:00" step="900">
+        <div class="results">
+          <div class="box">
+            <div class="k">Horas trabalhadas</div>
+            <div class="v" id="worked">—</div>
+          </div>
+          <div class="box">
+            <div class="k">Hora extra (acima da carga)</div>
+            <div class="v" id="extra">—</div>
+          </div>
+          <div class="box">
+            <div class="k">Saldo do dia (vs carga)</div>
+            <div class="v" id="saldo">—</div>
+          </div>
         </div>
 
-        <div>
-          <label>Carga horária</label>
-          <input id="carga" type="time" value="07:20">
+        <div class="hint">
+          Dica: se sua saída for depois da meia-noite (ex.: entrou 22:00 e saiu 06:00), o app entende automaticamente.
         </div>
       </div>
-
-      <div class="row">
-        <button onclick="calc()">Calcular</button>
-      </div>
-
-      <p id="out"></p>
     </div>
   </div>
-</div>
 
 <script>
-const $ = id => document.getElementById(id);
+(() => {
+  const $ = (id) => document.getElementById(id);
 
-function timeToMs(hhmm){
-  const [h,m] = hhmm.split(":").map(Number);
-  return ((h*60)+m)*60*1000;
-}
+  // Inputs
+  const entradaEl = $("entrada");
+  const saidaEl   = $("saida");
+  const almocoEl  = $("almoco");
+  const cargaEl   = $("carga");
 
-function timeToHours(hhmm){
-  const [h,m] = hhmm.split(":").map(Number);
-  return h + (m/60);
-}
+  // Outputs
+  const workedEl = $("worked");
+  const extraEl  = $("extra");
+  const saldoEl  = $("saldo");
 
-function calc(){
-  const entrada = timeToMs($("entrada").value);
-  let saida = timeToMs($("saida").value);
-  const almocoH = timeToHours($("almoco").value);
-  const carga = timeToMs($("carga").value);
+  const statusBadge = $("statusBadge");
+  const statusText  = $("statusText");
+  const dot = statusBadge.querySelector(".dot");
 
-  if(saida < entrada) saida += 86400000;
+  const themeBtn = $("themeBtn");
+  const installHint = $("installHint");
 
-  const worked = (saida - entrada) - (almocoH * 3600000);
-  const extra = Math.max(0, worked - carga);
+  const KEY = "pwa_horas_v1";
 
-  $("out").innerText =
-    `Trabalhadas: ${(worked/3600000).toFixed(2)}h | Extra: ${(extra/3600000).toFixed(2)}h`;
-}
+  function setStatus(text, isBad=false){
+    statusText.textContent = text;
+    dot.classList.toggle("bad", isBad);
+  }
+
+  function pad2(n){ return String(n).padStart(2,"0"); }
+
+  function msToHHMMSS(ms){
+    const sign = ms < 0 ? -1 : 1;
+    ms = Math.abs(ms);
+    const totalSec = Math.floor(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    const out = `${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+    return sign < 0 ? "-" + out : out;
+  }
+
+  function parseTimeToMs(timeStr){
+    // timeStr "HH:MM"
+    const [hh, mm] = timeStr.split(":").map(Number);
+    const d = new Date();
+    d.setHours(hh, mm, 0, 0);
+    return d.getTime();
+  }
+
+  function hhmmToMs(hhmm){
+    // "HH:MM" -> duração em ms
+    const [hh, mm] = hhmm.split(":").map(Number);
+    return ((hh * 60) + mm) * 60 * 1000;
+  }
+
+  function calc(){
+    const entrada = entradaEl.value;
+    const saida   = saidaEl.value;
+    const almocoT = almocoEl.value; // agora é "HH:MM"
+    const carga   = cargaEl.value;  // "HH:MM"
+
+    if(!entrada || !saida || !almocoT || !carga){
+      setStatus("Preencha corretamente", true);
+      return null;
+    }
+
+    const inMs  = parseTimeToMs(entrada);
+    let outMs   = parseTimeToMs(saida);
+
+    // Se saída for "menor" que entrada, assume que virou o dia
+    if(outMs < inMs) outMs += 24 * 60 * 60 * 1000;
+
+    const lunchMs = hhmmToMs(almocoT);
+    const workedMs = (outMs - inMs) - lunchMs;
+
+    const baseMs   = hhmmToMs(carga);
+    const extraMs  = Math.max(0, workedMs - baseMs);
+    const saldoMs  = workedMs - baseMs;
+
+    workedEl.textContent = msToHHMMSS(workedMs);
+    extraEl.textContent  = msToHHMMSS(extraMs);
+    saldoEl.textContent  = msToHHMMSS(saldoMs);
+
+    setStatus("Calculado");
+    return { entrada, saida, almocoT, carga, workedMs, extraMs, saldoMs, at: Date.now() };
+  }
+
+  function save(){
+    const result = calc();
+    if(!result) return;
+    localStorage.setItem(KEY, JSON.stringify(result));
+    setStatus("Salvo");
+  }
+
+  function load(){
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return;
+    try{
+      const data = JSON.parse(raw);
+      entradaEl.value = data.entrada ?? "09:00";
+      saidaEl.value   = data.saida ?? "18:00";
+      almocoEl.value  = data.almocoT ?? "01:00";  // atualizado
+      cargaEl.value   = data.carga ?? "07:20";
+      calc();
+      setStatus("Carregado");
+    }catch{}
+  }
+
+  function clearAll(){
+    entradaEl.value = "09:00";
+    saidaEl.value   = "18:00";
+    almocoEl.value  = "01:00";
+    cargaEl.value   = "07:20";
+    workedEl.textContent = "—";
+    extraEl.textContent  = "—";
+    saldoEl.textContent  = "—";
+    localStorage.removeItem(KEY);
+    setStatus("Limpo");
+  }
+
+  // Tema (manual)
+  function getTheme(){ return localStorage.getItem("theme") || "dark"; }
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+    localStorage.setItem("theme", t);
+    themeBtn.textContent = t === "light" ? "🌞 Tema" : "🌙 Tema";
+  }
+  themeBtn.addEventListener("click", () => {
+    applyTheme(getTheme() === "light" ? "dark" : "light");
+  });
+
+  $("calcBtn").addEventListener("click", calc);
+  $("saveBtn").addEventListener("click", save);
+  $("clearBtn").addEventListener("click", clearAll);
+
+  [entradaEl, saidaEl, almocoEl, cargaEl].forEach(el =>
+    el.addEventListener("change", calc)
+  );
+
+  // Service Worker
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
+  }
+
+  // Instalação (banner)
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installHint.innerHTML = `<button id="installBtn" class="secondary" type="button">📲 Instalar</button>`;
+    setTimeout(() => {
+      const btn = document.getElementById("installBtn");
+      if(btn){
+        btn.addEventListener("click", async () => {
+          try{
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+          } finally {
+            deferredPrompt = null;
+            installHint.textContent = "";
+          }
+        });
+      }
+    }, 0);
+  });
+
+  applyTheme(getTheme());
+  load();
+})();
 </script>
 </body>
 </html>
