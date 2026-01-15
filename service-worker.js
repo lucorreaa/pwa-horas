@@ -1,4 +1,4 @@
-const CACHE_NAME = "pwa-horas-v8";
+const CACHE_NAME = "pwa-horas-v9";
 const ASSETS = [
   "./",
   "./index.html",
@@ -27,6 +27,7 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+
 
 
 
