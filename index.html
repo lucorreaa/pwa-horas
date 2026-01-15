@@ -55,20 +55,35 @@
       gap:12px;
     }
 
-    /* ✅ MOBILE: SÓ ajusta os cards de cima (inputs) + botões
-       - deixa mais estreito e centralizado
-       - NÃO mexe em .results e .box
+    /* ✅ MOBILE: (1) diminuir largura e centralizar inputs do topo
+       ✅ MOBILE: (2) padronizar ALTURA do Almoço (type=number no iOS fica mais alto)
+       ✅ MOBILE: (3) manter altura dos outros inputs igual
+       ❌ NÃO mexe em .results/.box (cards de baixo)
     */
     @media (max-width:640px){
       .grid{
         grid-template-columns: 1fr;
-        max-width: 360px;        /* <- ajuste fino: 360 / 380 / 400 */
+        max-width: 360px;  /* ajuste fino: 340 / 360 / 380 */
         margin: 0 auto;
       }
       .row{
-        max-width: 360px;        /* mantém botões alinhados com os inputs */
+        max-width: 360px;
         margin-left: auto;
         margin-right: auto;
+      }
+
+      /* padroniza altura dos 4 inputs do topo (garante que o "Almoço" não fique mais alto no iOS) */
+      .grid input{
+        height: 44px;
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 44px;
+      }
+
+      /* força o input number do iOS a não "engordar" diferente */
+      #almoco{
+        -webkit-appearance: none;
+        appearance: none;
       }
     }
 
