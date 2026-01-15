@@ -123,7 +123,7 @@
     <header>
       <div>
         <h1>Calculadora de Horas</h1>
-        <div class="sub">Entrada, saída e almoço → horas trabalhadas e extra (offline e instalável).</div>
+        <div class="sub">Entrada, saída, almoço e carga → horas trabalhadas e extra (offline e instalável).</div>
       </div>
       <div class="topRight">
         <span id="statusBadge" class="badge"><span class="dot"></span><span id="statusText">Pronto</span></span>
@@ -138,23 +138,22 @@
             <label for="entrada">Entrada</label>
             <input id="entrada" type="time" value="09:00" />
           </div>
-        
+
           <div>
             <label for="saida">Saída</label>
             <input id="saida" type="time" value="19:10" />
           </div>
-        
+
           <div>
             <label for="almoco">Almoço (horas)</label>
-            <input id="almoco" type="number" min="0" step="0.25" value="1" />
+            <input id="almoco" type="number" min="0" step="0.25" value="1" inputmode="decimal" />
           </div>
-        
+
           <div>
             <label for="carga">Carga horária (HH:MM)</label>
             <input id="carga" type="time" value="07:20" />
           </div>
         </div>
-
 
         <div class="row">
           <div class="btns">
@@ -171,11 +170,11 @@
             <div class="v" id="worked">—</div>
           </div>
           <div class="box">
-            <div class="k">Hora extra (acima de 8h)</div>
+            <div class="k">Hora extra (acima da carga)</div>
             <div class="v" id="extra">—</div>
           </div>
           <div class="box">
-            <div class="k">Saldo do dia (vs 8h)</div>
+            <div class="k">Saldo do dia (vs carga)</div>
             <div class="v" id="saldo">—</div>
           </div>
         </div>
@@ -191,10 +190,13 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
+  // Inputs
   const entradaEl = $("entrada");
   const saidaEl   = $("saida");
   const almocoEl  = $("almoco");
+  const cargaEl   = $("carga");
 
+  // Outputs
   const workedEl = $("worked");
   const extraEl  = $("extra");
   const saldoEl  = $("saldo");
@@ -234,14 +236,18 @@
     return d.getTime();
   }
 
+  function cargaToMs(hhmm){
+    const [hh, mm] = hhmm.split(":").map(Number);
+    return ((hh * 60) + mm) * 60 * 1000;
+  }
+
   function calc(){
     const entrada = entradaEl.value;
     const saida   = saidaEl.value;
     const almocoH = Number(almocoEl.value ?? 0);
-    const cargaEl   = $("carga");
+    const carga   = cargaEl.value; // "HH:MM"
 
-
-    if(!entrada || !saida || Number.isNaN(almocoH) || almocoH < 0){
+    if(!entrada || !saida || !carga || Number.isNaN(almocoH) || almocoH < 0){
       setStatus("Preencha corretamente", true);
       return null;
     }
@@ -249,21 +255,13 @@
     const inMs  = parseTimeToMs(entrada);
     let outMs   = parseTimeToMs(saida);
 
-    // se saída for "menor" que entrada, assume que virou o dia
+    // Se saída for "menor" que entrada, assume que virou o dia
     if(outMs < inMs) outMs += 24 * 60 * 60 * 1000;
 
     const lunchMs = almocoH * 60 * 60 * 1000;
 
     const workedMs = (outMs - inMs) - lunchMs;
-    const carga = cargaEl.value; // HH:MM
-    if (!carga) {
-      setStatus("Informe a carga horária", true);
-      return null;
-}
-
-const [ch, cm] = carga.split(":").map(Number);
-const baseMs = ((ch * 60) + cm) * 60 * 1000;
-
+    const baseMs   = cargaToMs(carga);
 
     const extraMs = Math.max(0, workedMs - baseMs);
     const saldoMs = workedMs - baseMs;
@@ -273,7 +271,7 @@ const baseMs = ((ch * 60) + cm) * 60 * 1000;
     saldoEl.textContent  = msToHHMMSS(saldoMs);
 
     setStatus("Calculado");
-    return { entrada, saida, almocoH, workedMs, extraMs, saldoMs, at: Date.now() };
+    return { entrada, saida, almocoH, carga, workedMs, extraMs, saldoMs, at: Date.now() };
   }
 
   function save(){
@@ -291,7 +289,7 @@ const baseMs = ((ch * 60) + cm) * 60 * 1000;
       entradaEl.value = data.entrada ?? "09:00";
       saidaEl.value   = data.saida ?? "18:00";
       almocoEl.value  = data.almocoH ?? 1;
-      // recalcula na carga
+      cargaEl.value   = data.carga ?? "07:20";
       calc();
       setStatus("Carregado");
     }catch{
@@ -303,6 +301,7 @@ const baseMs = ((ch * 60) + cm) * 60 * 1000;
     entradaEl.value = "09:00";
     saidaEl.value   = "18:00";
     almocoEl.value  = 1;
+    cargaEl.value   = "07:20";
     workedEl.textContent = "—";
     extraEl.textContent  = "—";
     saldoEl.textContent  = "—";
@@ -325,11 +324,10 @@ const baseMs = ((ch * 60) + cm) * 60 * 1000;
   $("saveBtn").addEventListener("click", save);
   $("clearBtn").addEventListener("click", clearAll);
 
-  // auto-calc ao mudar
+  // Auto-calc ao mudar
   [entradaEl, saidaEl, almocoEl, cargaEl].forEach(el =>
-  el.addEventListener("change", calc)
-);
-
+    el.addEventListener("change", calc)
+  );
 
   // Service Worker
   if("serviceWorker" in navigator){
