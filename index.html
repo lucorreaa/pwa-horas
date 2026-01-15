@@ -54,40 +54,12 @@
       grid-template-columns: repeat(3, 1fr);
       gap:12px;
     }
-
-    /* ✅ MOBILE: (1) diminuir largura e centralizar inputs do topo
-       ✅ MOBILE: (2) padronizar ALTURA do Almoço (type=number no iOS fica mais alto)
-       ✅ MOBILE: (3) manter altura dos outros inputs igual
-       ❌ NÃO mexe em .results/.box (cards de baixo)
-    */
     @media (max-width:640px){
-      .grid{
-        grid-template-columns: 1fr;
-        max-width: 360px;  /* ajuste fino: 340 / 360 / 380 */
-        margin: 0 auto;
-      }
-      .row{
-        max-width: 360px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-
-      /* padroniza altura dos 4 inputs do topo (garante que o "Almoço" não fique mais alto no iOS) */
-      .grid input{
-        height: 44px;
-        padding-top: 0;
-        padding-bottom: 0;
-        line-height: 44px;
-      }
-
-      /* força o input number do iOS a não "engordar" diferente */
-      #almoco{
-        -webkit-appearance: none;
-        appearance: none;
-      }
+      .grid{grid-template-columns:1fr}
     }
 
     label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+
     input{
       width:100%;
       padding:12px 12px;
@@ -99,6 +71,41 @@
       font-size:15px;
     }
     input:focus{border-color: rgba(37,99,235,.7)}
+
+    /* ✅ MOBILE: diminuir o COMPRIMENTO dos 4 inputs do topo (sem mudar estilo/tamanho)
+       e centralizar deixando “folga” dos lados */
+    @media (max-width:640px){
+      .grid input{
+        width: calc(100% - 24px); /* cria folga dos lados sem mexer no container */
+        margin: 0 auto;           /* centraliza dentro da coluna */
+        display:block;
+      }
+
+      /* mantém o label alinhado com o input (mesma folga) */
+      .grid label{
+        width: calc(100% - 24px);
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* botões alinhados com os inputs (mesma folga) */
+      .row{
+        width: calc(100% - 24px);
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Almoço: padroniza altura com os inputs time no iOS */
+      #almoco{
+        height: 44px;
+        line-height: 44px;
+        padding-top: 0;
+        padding-bottom: 0;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+    }
+
     .row{
       display:flex; gap:10px; flex-wrap:wrap;
       align-items:center; justify-content:space-between;
