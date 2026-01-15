@@ -116,6 +116,35 @@
     .dot.bad{background: var(--bad)}
     .topRight{display:flex; gap:10px; align-items:center; justify-content:flex-end; flex-wrap:wrap}
     .small{font-size:12px; color:var(--muted)}
+    /* ===== Ajuste de alinhamento no celular ===== */
+    @media (max-width: 640px) {
+      /* limita e centraliza os "balões" */
+      .grid,
+      .results {
+        width: min(420px, 100%);
+        margin: 0 auto;
+      }
+    
+      /* cada campo vira um "balão" com largura igual e centralizado */
+      .grid > div {
+        width: 100%;
+        margin: 0 auto;
+      }
+    
+      /* garante que inputs e botões respeitem o mesmo tamanho */
+      input,
+      .box {
+        width: 100%;
+      }
+    
+      /* centraliza o bloco de botões e limita largura igual aos balões */
+      .row {
+        width: min(420px, 100%);
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -362,3 +391,4 @@
 </script>
 </body>
 </html>
+
